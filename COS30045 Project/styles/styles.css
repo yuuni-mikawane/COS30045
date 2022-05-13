@@ -93,8 +93,17 @@ nav {
     background-color: #f5f5f5;   
 }
 
-
-
-
-
-
+div.tooltip {	
+    position: absolute;
+    text-align: center;
+    font-weight: bold;
+    width: 60px;
+    height: 28px;
+    padding: 2px;
+    font: 14px sans-serif;
+    background: #fffcd4;
+    border: 1px;
+    border-style: solid;
+    border-radius: 8px;
+    pointer-events: none;
+}
