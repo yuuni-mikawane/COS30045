@@ -11,7 +11,7 @@ var color = d3.scaleQuantize()
 
 // Define the div for the tooltip box
 var divTooltip = d3.select("body").append("div")	
-    .attr("class", "tooltip")				
+    .attr("class", "tooltip")
     .style("opacity", 0);
 
 //creating the stack visualization, with the .keys() specify which properties (series) in the dataset to use
@@ -88,7 +88,6 @@ function stackedBarChart(dataset){
                                     .duration(200)
                                     .style("opacity", 0.9)
                                     .style("width", xScale.bandwidth() + "px");
-                                    console.log(xScale.bandwidth());
                         divTooltip.style.position = "absolute";
                         divTooltip.html(d[1])
                                     .style("left", d3.select(this).attr("x") + "px")
