@@ -1,8 +1,9 @@
-var w = 600;
+var w = 700;
 var h = 500;
 var barPadding = 0.3; //padding between bars
-var chartPadding = 100; //padding for the axis' space
+var chartPadding = 80; //padding for the axis' space
 var svgRightPadding = 50;
+var outerPadding = 0.5;
 var tooltipYOffset = 200;
 
 //colorscheme
@@ -29,7 +30,7 @@ var svg = d3.select("section")
 function stackedBarChart(dataset){
     //inputting the dataset to the stack, generating the new dictionary of data with stacked values
     var series = stack(dataset);
-    
+    console.log(dataset);
     var groups = svg.selectAll("g") 
                     .data(series)
                     .enter()
@@ -41,7 +42,8 @@ function stackedBarChart(dataset){
     var xScale = d3.scaleBand()
                     .domain(dataset)
                     .range([chartPadding, w - svgRightPadding])
-                    .paddingInner(barPadding);
+                    .paddingInner(barPadding)
+                    .paddingOuter(outerPadding);
 
     //scale linear for the values (the actual numbers)
     var yScale = d3.scaleLinear()
@@ -50,6 +52,13 @@ function stackedBarChart(dataset){
                         })
                     ])
                     .range([h - chartPadding, chartPadding]);
+    
+    //axis declaration
+    var xAxis = d3.axisBottom()
+                .scale(xScale);
+                
+    var yAxis = d3.axisLeft()
+                .scale(yScale);
 
     //drawing the stacked rectangles
     var rects = groups.selectAll("rect")
@@ -105,6 +114,15 @@ function stackedBarChart(dataset){
                         //         return color(i);
                         //     });
                     });
+    
+    //have to put axis at the end, or the other SVGs will overlap the axis
+    svg.append("g")
+        .attr("transform", "translate(0, " + (h - chartPadding) + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("transform", "translate(" + chartPadding + ", 0)")
+        .call(yAxis);
 }
 
 //d3.csv(<insert csv file name>) is for reading data from a csv.
