@@ -1,5 +1,5 @@
-// Define the div for the tooltip box
-//DEFINE THIS AT THE START OF THE SCRIPT
+//Define the div for the tooltip box
+//DEFINE THIS AT THE START OF THE SCRIPT TO CREATE THE DOM ELEMENT
 var divTooltip = d3.select("body").append("div")	
     .attr("class", "tooltip")
     .style("opacity", 0);
@@ -16,10 +16,10 @@ svg.on("mouseover", function(event, d) {
                 .style("opacity", 0.9)
                 .style("width", "200" + "px");
 
-    //positioning
-    divTooltip.html(d)
-                .style("left", pageX + "px")
-                .style("top", pageY + "px");
+    //positioning existing tooltip and inserting text inside the tooltip
+    divTooltip.html("value" + d) //put text in here, probably the value as well
+                .style("left", pageX + "px") //position X
+                .style("top", pageY + "px"); //position Y
     //ON MOUSEOUT
 }).on("mouseout", function(d) {
     //removing the existing tooltip
