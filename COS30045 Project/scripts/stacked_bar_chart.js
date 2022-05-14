@@ -1,13 +1,16 @@
 //data imported from CSV
 var importedData;
+//extracting the year labels
+var yearBand;
 
-var w = 700;
-var h = 500;
+var w = 750;
+var h = 600;
 var barPadding = 0.3; //padding between bars
 var chartPaddingAxis = 75; //padding for the axis' space
+var chartPaddingTop = 100; //padding top for the chart
 var chartPaddingRight = 200;
 var outerPadding = 0.5;
-var tooltipYOffset = 250;
+var tooltipYOffset = 240;
 
 //button variables
 var productionDisplay = true;
@@ -53,10 +56,136 @@ function SetUpXYScale(dataset){
     //scale linear for the values (the actual numbers)
     yScale = d3.scaleLinear()
                     .domain([0, d3.max(dataset, function(d){
+                            return d;
+                        })
+                    ])
+                    .range([h - chartPaddingAxis, chartPaddingTop]);
+}
+
+function SetUpIntegratedXYScale(dataset){
+    //a scale band is used for each stacked bar
+    xScale = d3.scaleBand()
+                    .domain(dataset)
+                    .range([chartPaddingAxis, w - chartPaddingRight])
+                    .paddingInner(barPadding)
+                    .paddingOuter(outerPadding);
+
+    //scale linear for the values (the actual numbers)
+    yScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d){
                             return (d.consumption + d.netExport);
                         })
                     ])
-                    .range([h - chartPaddingAxis, chartPaddingAxis]);
+                    .range([h - chartPaddingAxis, chartPaddingTop]);
+    console.log("set up XY scale integrated");
+}
+
+function BarChart(dataset){
+    //axis declaration
+    var xAxis = d3.axisBottom()
+                .scale(xScale)
+                .tickFormat(function(d,i){ return yearBand[i] });
+                
+    var yAxis = d3.axisLeft()
+                .scale(yScale);
+
+    svg.selectAll("rect")
+            .data(dataset)
+            .enter()
+            .append("rect")
+            //get the start of the band to use as the X value
+            .attr("x", function(d, i){
+                return xScale(dataset[i]);
+            })
+            //get the Y value based on the linear scale
+            .attr("y", function(d){
+                return yScale(d);
+            })
+            //bar width is the bandwidth of each band, minus padding
+            .attr("width", xScale.bandwidth())
+            //height is the length from the first value to second value of the value pair
+            .attr("height", function(d){
+                return h - yScale(d) - chartPaddingAxis;
+            });
+
+        svg.selectAll("text")
+            .data(dataset)
+            .enter()
+            .append("text")
+            .text(function(d){
+                return d;
+            })
+            .attr("text-anchor", "middle")
+            .attr("x", function(d, i){
+                return xScale(dataset[i]) + (xScale.bandwidth() / 2);
+            })
+            .attr("y", function(d, i){
+                return yScale(d) - 10;
+            });
+
+    //have to put axis at the end, or the other SVGs will overlap the axis
+    svg.append("g")
+        .attr("transform", "translate(0, " + (h - chartPaddingAxis) + ")")
+        .call(xAxis);
+
+    svg.append("g")
+        .attr("transform", "translate(" + chartPaddingAxis + ", 0)")
+        .call(yAxis);
+    
+    //all chart title
+    svg.append('text')
+        .attr("x", (w / 2))
+        .attr("y", (chartPaddingAxis / 2))
+        .attr("text-anchor", "middle")
+        .style('font-size', "medium")
+        .style("font-weight", "bold")
+        .text("Australia energy net export, consumption and production\n(in Petajoules)");
+}
+
+function ProductionLineChart(dataset){
+    //line generator
+    line = d3.line()
+            .x(function(d, i){
+                return xScale(dataset[i]) + xScale.bandwidth() / 2;
+            })
+            .y(function(d) { return yScale(d); });
+
+    //drawing the "path" using line
+    svg.append("path")
+        .datum(productionData)
+        .attr("class", "line")
+        .attr("d", line);
+
+    //drawing the circle dots
+    svg.selectAll("circle")
+            .data(dataset)
+            .enter()
+            .append("circle")
+            .attr("class", "dot")
+            .attr("cx", function(d, i){
+                return xScale(dataset[i]) + xScale.bandwidth() / 2;
+            })
+            .attr("cy", function(d, i){
+                return yScale(dataset[i].production);
+            })
+            .attr("r", 6)
+            .attr("fill", color(3))
+            .on("mouseover", function(event, d) {
+                if (productionDisplay)
+                {
+                    divTooltip.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                    divTooltip.html(d.production)
+                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                }
+                })					
+            .on("mouseout", function(d) {		
+                divTooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);	
+            });
 }
 
 function ProductionLineChartIntegrated(dataset){
@@ -106,6 +235,9 @@ function ProductionLineChartIntegrated(dataset){
                     .duration(500)
                     .style("opacity", 0);	
             });
+        
+    //set this variable to true to make sure the line and dots are drawn
+    productionDisplay = true;
 }
 
 function DisableProductionLineChart(){
@@ -137,9 +269,6 @@ function StackedBarChart(dataset){
                         return color(i);
                     });
     
-    //extracting the year labels
-    let yearBand = dataset.map(d => d.year);
-
     //axis declaration
     var xAxis = d3.axisBottom()
                 .scale(xScale)
@@ -167,7 +296,8 @@ function StackedBarChart(dataset){
                     //height is the length from the first value to second value of the value pair
                     .attr("height", function(d){
                         return yScale(d[0]) - yScale(d[1]);
-                    }).on("mouseover", function(event, d) {
+                    })
+                    .on("mouseover", function(event, d) {
                         //transition tooltip appear 
                         divTooltip.transition()
                                     .duration(200)
@@ -193,6 +323,15 @@ function StackedBarChart(dataset){
     svg.append("g")
         .attr("transform", "translate(" + chartPaddingAxis + ", 0)")
         .call(yAxis);
+        
+    //all chart title
+    svg.append('text')
+        .attr("x", (w / 2))
+        .attr("y", (chartPaddingAxis / 2))
+        .attr("text-anchor", "middle")
+        .style('font-size', "medium")
+        .style("font-weight", "bold")
+        .text("Australia energy net export, consumption and production\n(in Petajoules)");
 }
 
 function Legend(dataset) {
@@ -200,7 +339,7 @@ function Legend(dataset) {
 }
 
 function DrawSVGAll(){
-    SetUpXYScale(importedData);
+    SetUpIntegratedXYScale(importedData);
     StackedBarChart(importedData);
     ProductionLineChartIntegrated(importedData);
     Legend(importedData);
@@ -216,6 +355,7 @@ d3.csv("data/Net_export_Consumption_Production_in_Aus.csv", function(d) {
     };
 }).then(function(data){
     importedData = data;
+    yearBand = importedData.map(d => d.year);
     DrawSVGAll();
 });
 
@@ -242,9 +382,13 @@ d3.select("#productionBtn")
     if (currentChart !== ChartProduction)
     {
         d3.selectAll("svg > *")
-            .transition()
-            .style("opacity", 0);
+            .remove();
+        currentChart = ChartProduction;
 
+        //extracting the production data
+        let productionData = importedData.map(d => d.production);
+        SetUpXYScale(productionData);
+        BarChart(productionData);
     }
 });
 
@@ -253,9 +397,13 @@ d3.select("#netExportBtn")
     if (currentChart !== ChartNetExport)
     {
         d3.selectAll("svg > *")
-            .transition()
-            .style("opacity", 0);
+            .remove();
+        currentChart = ChartNetExport;
 
+        //extracting the net export data
+        let netExportData = importedData.map(d => d.netExport);
+        SetUpXYScale(netExportData);
+        BarChart(netExportData);
     }
 });
 
@@ -264,9 +412,13 @@ d3.select("#consumptionBtn")
     if (currentChart !== ChartConsumption)
     {
         d3.selectAll("svg > *")
-            .transition()
-            .style("opacity", 0);
+            .remove();
+        currentChart = ChartConsumption;
 
+        //extracting the consumption data
+        let consumptionData = importedData.map(d => d.consumption);
+        SetUpXYScale(consumptionData);
+        BarChart(consumptionData);
     }
 });
 
@@ -274,9 +426,13 @@ d3.select("#allBtn")
 .on("click", function() {
     if (currentChart !== ChartAll)
     {
+        currentChart = ChartAll;
         d3.selectAll("svg > *")
-            .transition()
-            .style("opacity", 0);
+            .remove();
 
+        SetUpIntegratedXYScale(importedData);
+        StackedBarChart(importedData);
+        ProductionLineChartIntegrated(importedData);
+        Legend(importedData);
     }
 });
