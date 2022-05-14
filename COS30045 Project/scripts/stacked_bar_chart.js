@@ -4,11 +4,11 @@ var barPadding = 0.3; //padding between bars
 var chartPadding = 80; //padding for the axis' space
 var svgRightPadding = 50;
 var outerPadding = 0.5;
-var tooltipYOffset = 200;
+var tooltipYOffset = 220;
 
 //colorscheme
-var color = d3.scaleQuantize()
-            .range(["#4535aa", "#b05cba", "#d6d1f5"]);
+var color = d3.scaleOrdinal()
+            .range(["#4535aa", "#d6d1f5", "#b05cba"]);
 
 // Define the div for the tooltip box
 var divTooltip = d3.select("body").append("div")	
@@ -26,6 +26,52 @@ var svg = d3.select("section")
             .attr("height", h)
             .style("background", "white");
 
+function LineChart(dataset){
+    //a scale band is used for each stacked bar
+    var xScale = d3.scaleBand()
+                    .domain(dataset)
+                    .range([chartPadding, w - svgRightPadding])
+                    .paddingInner(barPadding)
+                    .paddingOuter(outerPadding);
+
+    //scale linear for the values (the actual numbers)
+    var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(dataset, function(d){
+                            return (d.consumption + d.netExport);
+                        })
+                    ])
+                    .range([h - chartPadding, chartPadding]);
+
+    //extracting the production data
+    let productionData = dataset.map(d => d.production);
+
+    //line generator
+    line = d3.line()
+            .x(function(d, i){
+                return xScale(dataset[i]) + xScale.bandwidth() / 2;
+            })
+            .y(function(d) { return yScale(d); });
+
+    //drawing the "path" using line
+    svg.append("path")
+        .datum(productionData)
+        .attr("class", "line")
+        .attr("d", line);
+
+    //drawing the circle dots
+    svg.selectAll("circle")
+            .data(dataset)
+            .enter()
+            .append("circle")
+            .attr("cx", function(d, i){
+                return xScale(dataset[i]) + xScale.bandwidth() / 2;
+            })
+            .attr("cy", function(d, i){
+                return yScale(dataset[i].production);
+            })
+            .attr("r", 6)
+            .attr("fill", color(3));
+}
 
 function stackedBarChart(dataset){
     //inputting the dataset to the stack, generating the new dictionary of data with stacked values
@@ -47,7 +93,7 @@ function stackedBarChart(dataset){
     //scale linear for the values (the actual numbers)
     var yScale = d3.scaleLinear()
                     .domain([0, d3.max(dataset, function(d){
-                            return (d.consumption + d.netExport) * 11/10;
+                            return (d.consumption + d.netExport);
                         })
                     ])
                     .range([h - chartPadding, chartPadding]);
@@ -78,7 +124,7 @@ function stackedBarChart(dataset){
                     })
                     .style("stroke", "black")
                     .style("stroke-width", 1)
-                    //bar width is the bandwidth of each band, minus padding (which is 0.1, previously stated)
+                    //bar width is the bandwidth of each band, minus padding
                     .attr("width", xScale.bandwidth())
                     //height is the length from the first value to second value of the value pair
                     .attr("height", function(d){
@@ -101,7 +147,7 @@ function stackedBarChart(dataset){
                                     .style("opacity", 0.9)
                                     .style("width", xScale.bandwidth() + "px");
                         divTooltip.style.position = "absolute";
-                        divTooltip.html(d[1])
+                        divTooltip.html(d[1] - d[0])
                                     .style("left", d3.select(this).attr("x") + "px")
                                     .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipYOffset ) + "px");
                     })
@@ -122,7 +168,6 @@ function stackedBarChart(dataset){
     svg.append("g")
         .attr("transform", "translate(0, " + (h - chartPadding) + ")")
         .call(xAxis);
-    console.log(xAxis);
 
     svg.append("g")
         .attr("transform", "translate(" + chartPadding + ", 0)")
@@ -140,4 +185,5 @@ d3.csv("data/Net_export_Consumption_Production_in_Aus.csv", function(d) {
 }).then(function(data){
     dataset = data;
     stackedBarChart(dataset);
+    LineChart(dataset);
 });
