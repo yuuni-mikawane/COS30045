@@ -1,10 +1,16 @@
+//data imported from CSV
+var importedData;
+
 var w = 700;
 var h = 500;
 var barPadding = 0.3; //padding between bars
 var chartPadding = 80; //padding for the axis' space
 var svgRightPadding = 50;
 var outerPadding = 0.5;
-var tooltipYOffset = 220;
+var tooltipYOffset = 250;
+
+//button toggle variables
+var productionDisplay = true;
 
 //colorscheme
 var color = d3.scaleOrdinal()
@@ -26,7 +32,7 @@ var svg = d3.select("section")
             .attr("height", h)
             .style("background", "white");
 
-function LineChart(dataset){
+function ProductionLineChart(dataset){
     //a scale band is used for each stacked bar
     var xScale = d3.scaleBand()
                     .domain(dataset)
@@ -72,13 +78,16 @@ function LineChart(dataset){
             })
             .attr("r", 6)
             .attr("fill", color(3))
-            .on("mouseover", function(d) {		
-                divTooltip.transition()
-                    .duration(200)
-                    .style("opacity", .9);
-                divTooltip.html(d)
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+            .on("mouseover", function(event, d) {
+                if (productionDisplay)
+                {
+                    divTooltip.transition()
+                            .duration(200)
+                            .style("opacity", .9);
+                    divTooltip.html(d.production)
+                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                }
                 })					
             .on("mouseout", function(d) {		
                 divTooltip.transition()
@@ -87,7 +96,25 @@ function LineChart(dataset){
             });
 }
 
-function stackedBarChart(dataset){
+function DisableProductionLineChart(){
+    svg.selectAll(".line")
+        .transition()
+        .style("opacity", 0);
+    svg.selectAll(".dot")
+        .transition()
+        .style("opacity", 0);
+}
+
+function EnableProductionLineChart(){
+    svg.selectAll(".line")
+        .transition()
+        .style("opacity", 1);
+    svg.selectAll(".dot")
+        .transition()
+        .style("opacity", 1);
+}
+
+function StackedBarChart(dataset){
     //inputting the dataset to the stack, generating the new dictionary of data with stacked values
     var series = stack(dataset);
     var groups = svg.selectAll("g") 
@@ -191,7 +218,22 @@ d3.csv("data/Net_export_Consumption_Production_in_Aus.csv", function(d) {
         netExport: parseInt(d.netExport),
     };
 }).then(function(data){
-    dataset = data;
-    stackedBarChart(dataset);
-    LineChart(dataset);
+    importedData = data;
+    StackedBarChart(importedData);
+    ProductionLineChart(importedData);
+});
+
+//onclicks for buttons
+d3.select("#productionBtn")
+.on("click", function() {
+    if(productionDisplay !== true)
+    {
+        EnableProductionLineChart();
+        productionDisplay = true;
+    }
+    else
+    {
+        DisableProductionLineChart();
+        productionDisplay = false;
+    }
 });
