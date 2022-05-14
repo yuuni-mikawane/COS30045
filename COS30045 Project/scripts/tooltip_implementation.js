@@ -4,7 +4,7 @@ var divTooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-//ADD THIS TO CREATE TOOLTIPS ON MOUSEOVER
+//ADD THIS TO CREATE TOOLTIPS ON MOUSEOVER/MOUSECLICK/MOUSEOUT
 svg.on("mouseover", function(event, d) {
     //store the event's position
     var pageX=event.pageX;

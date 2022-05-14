@@ -113,3 +113,13 @@ div.tooltip {
     stroke-width: 4;
     fill: none;
 }
+
+.stacked_bar {
+    stroke: black;
+    stroke-width: 1;
+}
+
+.dot {
+    stroke: black;
+    stroke-width: 2;
+}

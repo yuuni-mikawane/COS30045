@@ -63,6 +63,7 @@ function LineChart(dataset){
             .data(dataset)
             .enter()
             .append("circle")
+            .attr("class", "dot")
             .attr("cx", function(d, i){
                 return xScale(dataset[i]) + xScale.bandwidth() / 2;
             })
@@ -70,7 +71,20 @@ function LineChart(dataset){
                 return yScale(dataset[i].production);
             })
             .attr("r", 6)
-            .attr("fill", color(3));
+            .attr("fill", color(3))
+            .on("mouseover", function(d) {		
+                divTooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                divTooltip.html(d)
+                    .style("left", (d3.event.pageX) + "px")
+                    .style("top", (d3.event.pageY - 28) + "px");
+                })					
+            .on("mouseout", function(d) {		
+                divTooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);	
+            });
 }
 
 function stackedBarChart(dataset){
@@ -114,6 +128,7 @@ function stackedBarChart(dataset){
                     .data(function(d){ return d; })
                     .enter()
                     .append("rect")
+                    .attr("class", "stacked_bar")
                     //get the start of the band to use as the X value
                     .attr("x", function(d, i){
                         return xScale(dataset[i]);
@@ -122,8 +137,6 @@ function stackedBarChart(dataset){
                     .attr("y", function(d){
                         return yScale(d[1]);
                     })
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
                     //bar width is the bandwidth of each band, minus padding
                     .attr("width", xScale.bandwidth())
                     //height is the length from the first value to second value of the value pair
@@ -136,11 +149,6 @@ function stackedBarChart(dataset){
                         //     .attr("fill", function(d, i){
                         //         return color(i);
                         //     });
-
-
-
-                        var pageX=event.pageX;
-                        var pageY=event.pageY;
 
                         divTooltip.transition()
                                     .duration(200)
