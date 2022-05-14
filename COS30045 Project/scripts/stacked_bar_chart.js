@@ -30,7 +30,6 @@ var svg = d3.select("section")
 function stackedBarChart(dataset){
     //inputting the dataset to the stack, generating the new dictionary of data with stacked values
     var series = stack(dataset);
-    console.log(dataset);
     var groups = svg.selectAll("g") 
                     .data(series)
                     .enter()
@@ -48,14 +47,18 @@ function stackedBarChart(dataset){
     //scale linear for the values (the actual numbers)
     var yScale = d3.scaleLinear()
                     .domain([0, d3.max(dataset, function(d){
-                            return d.consumption + d.netExport;
+                            return (d.consumption + d.netExport) * 11/10;
                         })
                     ])
                     .range([h - chartPadding, chartPadding]);
     
+    //extracting the year labels
+    let yearBand = dataset.map(d => d.year);
+
     //axis declaration
     var xAxis = d3.axisBottom()
-                .scale(xScale);
+                .scale(xScale)
+                .tickFormat(function(d,i){ return yearBand[i] });
                 
     var yAxis = d3.axisLeft()
                 .scale(yScale);
@@ -119,6 +122,7 @@ function stackedBarChart(dataset){
     svg.append("g")
         .attr("transform", "translate(0, " + (h - chartPadding) + ")")
         .call(xAxis);
+    console.log(xAxis);
 
     svg.append("g")
         .attr("transform", "translate(" + chartPadding + ", 0)")
