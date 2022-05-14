@@ -4,13 +4,19 @@ var importedData;
 var w = 700;
 var h = 500;
 var barPadding = 0.3; //padding between bars
-var chartPadding = 80; //padding for the axis' space
-var svgRightPadding = 50;
+var chartPaddingAxis = 75; //padding for the axis' space
+var chartPaddingRight = 200;
 var outerPadding = 0.5;
 var tooltipYOffset = 250;
 
-//button toggle variables
+//button variables
 var productionDisplay = true;
+//chart enums
+const ChartAll = 0;
+const ChartProduction = 1;
+const ChartNetExport = 2;
+const ChartConsumption = 3;
+var currentChart = ChartAll;
 
 //colorscheme
 var color = d3.scaleOrdinal()
@@ -32,22 +38,28 @@ var svg = d3.select("section")
             .attr("height", h)
             .style("background", "white");
 
-function ProductionLineChart(dataset){
+//XY scale variable
+var xScale;
+var yScale;
+
+function SetUpXYScale(dataset){
     //a scale band is used for each stacked bar
-    var xScale = d3.scaleBand()
+    xScale = d3.scaleBand()
                     .domain(dataset)
-                    .range([chartPadding, w - svgRightPadding])
+                    .range([chartPaddingAxis, w - chartPaddingRight])
                     .paddingInner(barPadding)
                     .paddingOuter(outerPadding);
 
     //scale linear for the values (the actual numbers)
-    var yScale = d3.scaleLinear()
+    yScale = d3.scaleLinear()
                     .domain([0, d3.max(dataset, function(d){
                             return (d.consumption + d.netExport);
                         })
                     ])
-                    .range([h - chartPadding, chartPadding]);
+                    .range([h - chartPaddingAxis, chartPaddingAxis]);
+}
 
+function ProductionLineChartIntegrated(dataset){
     //extracting the production data
     let productionData = dataset.map(d => d.production);
 
@@ -124,20 +136,6 @@ function StackedBarChart(dataset){
                     .style("fill", function(d, i){
                         return color(i);
                     });
-    //a scale band is used for each stacked bar
-    var xScale = d3.scaleBand()
-                    .domain(dataset)
-                    .range([chartPadding, w - svgRightPadding])
-                    .paddingInner(barPadding)
-                    .paddingOuter(outerPadding);
-
-    //scale linear for the values (the actual numbers)
-    var yScale = d3.scaleLinear()
-                    .domain([0, d3.max(dataset, function(d){
-                            return (d.consumption + d.netExport);
-                        })
-                    ])
-                    .range([h - chartPadding, chartPadding]);
     
     //extracting the year labels
     let yearBand = dataset.map(d => d.year);
@@ -170,43 +168,42 @@ function StackedBarChart(dataset){
                     .attr("height", function(d){
                         return yScale(d[0]) - yScale(d[1]);
                     }).on("mouseover", function(event, d) {
-
-                        //changing fill color
-                        // d3.select(this)
-                        //     .attr("fill", function(d, i){
-                        //         return color(i);
-                        //     });
-
+                        //transition tooltip appear 
                         divTooltip.transition()
                                     .duration(200)
                                     .style("opacity", 0.9)
                                     .style("width", xScale.bandwidth() + "px");
-                        divTooltip.style.position = "absolute";
+                        //putting in the values and reposition tooltip
                         divTooltip.html(d[1] - d[0])
                                     .style("left", d3.select(this).attr("x") + "px")
                                     .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipYOffset ) + "px");
                     })
                     .on("mouseout", function(d) {
                         //removing the existing tooltip
-                        divTooltip.transition()		
-                            .duration(500)		
-                            .style("opacity", 0);	
-
-                        //changing fill color back
-                        // d3.select(this)
-                        //     .attr("fill", function(d, i){
-                        //         return color(i);
-                        //     });
+                        divTooltip.transition()
+                            .duration(500)
+                            .style("opacity", 0);
                     });
     
     //have to put axis at the end, or the other SVGs will overlap the axis
     svg.append("g")
-        .attr("transform", "translate(0, " + (h - chartPadding) + ")")
+        .attr("transform", "translate(0, " + (h - chartPaddingAxis) + ")")
         .call(xAxis);
 
     svg.append("g")
-        .attr("transform", "translate(" + chartPadding + ", 0)")
+        .attr("transform", "translate(" + chartPaddingAxis + ", 0)")
         .call(yAxis);
+}
+
+function Legend(dataset) {
+
+}
+
+function DrawSVGAll(){
+    SetUpXYScale(importedData);
+    StackedBarChart(importedData);
+    ProductionLineChartIntegrated(importedData);
+    Legend(importedData);
 }
 
 //d3.csv(<insert csv file name>) is for reading data from a csv.
@@ -219,21 +216,67 @@ d3.csv("data/Net_export_Consumption_Production_in_Aus.csv", function(d) {
     };
 }).then(function(data){
     importedData = data;
-    StackedBarChart(importedData);
-    ProductionLineChart(importedData);
+    DrawSVGAll();
 });
 
 //onclicks for buttons
+d3.select("#productionToggleBtn")
+.on("click", function() {
+    if (currentChart === ChartAll)
+    {
+        if(productionDisplay !== true)
+        {
+            EnableProductionLineChart();
+            productionDisplay = true;
+        }
+        else
+        {
+            DisableProductionLineChart();
+            productionDisplay = false;
+        }
+    }
+});
+
 d3.select("#productionBtn")
 .on("click", function() {
-    if(productionDisplay !== true)
+    if (currentChart !== ChartProduction)
     {
-        EnableProductionLineChart();
-        productionDisplay = true;
+        d3.selectAll("svg > *")
+            .transition()
+            .style("opacity", 0);
+
     }
-    else
+});
+
+d3.select("#netExportBtn")
+.on("click", function() {
+    if (currentChart !== ChartNetExport)
     {
-        DisableProductionLineChart();
-        productionDisplay = false;
+        d3.selectAll("svg > *")
+            .transition()
+            .style("opacity", 0);
+
+    }
+});
+
+d3.select("#consumptionBtn")
+.on("click", function() {
+    if (currentChart !== ChartConsumption)
+    {
+        d3.selectAll("svg > *")
+            .transition()
+            .style("opacity", 0);
+
+    }
+});
+
+d3.select("#allBtn")
+.on("click", function() {
+    if (currentChart !== ChartAll)
+    {
+        d3.selectAll("svg > *")
+            .transition()
+            .style("opacity", 0);
+
     }
 });
