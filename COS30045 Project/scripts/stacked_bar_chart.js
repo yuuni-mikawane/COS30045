@@ -230,7 +230,7 @@ function ProductionLineChartIntegrated(dataset){
                             .style("left", (d3.select(this).attr("cx") - 30) + "px")
                             .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
                 }
-                })					
+                })
             .on("mouseout", function(d) {		
                 divTooltip.transition()
                     .duration(500)
