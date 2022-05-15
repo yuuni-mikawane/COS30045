@@ -119,8 +119,8 @@ function choropleth(){
 					.style("opacity", 0);
 			})
 			.on("click", function(d){
-				d3.csv("./data/Energy_mix_by_states.csv").then(function(data){
-					pieChart(data);
+				d3.csv("./data/Energy_mix_by_states.csv").then(function(data,i){
+					pieChart(data,i);
 				})
 			})
 			.style("fill", function(d) {
@@ -151,7 +151,7 @@ function choropleth(){
 		    .attr("dy", 15)
 		    .text(function(d){return d.properties.STATE_NAME;});
 			
-		function pieChart(data){
+		function pieChart(data,i){
 				
 				var width = 350;
 				var	height = 350;
@@ -196,22 +196,18 @@ function choropleth(){
 						
 					}		
 				}	
-				var dataset = data.map(function(d,i){
-					return [d.coal, d.oil, d.gas, d.renewables];
-				})
 				
-				//Set up groups
+				
+				//Arc groups
 				
 				var arcs = svg.selectAll("g.arc")
-							.data(pie(function(dataset,i){
-								return dataset[i];
-							}))
+							.data(pie(data))
 							.enter()
 							.append("g")
 							.attr("class", "arc")
 							.attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
-				//Draw arc paths
+				//Arc paths
 				arcs.append("path")
 					.attr("fill", function(d, i) {
 					return colour(i);
