@@ -114,7 +114,7 @@ div.tooltip {
     fill: none;
 }
 
-.stacked_bar {
+.stacked_bar, .bar {
     stroke: black;
     stroke-width: 1;
 }

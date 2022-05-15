@@ -77,10 +77,9 @@ function SetUpIntegratedXYScale(dataset){
                         })
                     ])
                     .range([h - chartPaddingAxis, chartPaddingTop]);
-    console.log("set up XY scale integrated");
 }
 
-function BarChart(dataset){
+function BarChart(dataset, chartTitle, colorID){
     //axis declaration
     var xAxis = d3.axisBottom()
                 .scale(xScale)
@@ -93,6 +92,7 @@ function BarChart(dataset){
             .data(dataset)
             .enter()
             .append("rect")
+            .attr("class", "bar")
             //get the start of the band to use as the X value
             .attr("x", function(d, i){
                 return xScale(dataset[i]);
@@ -106,7 +106,8 @@ function BarChart(dataset){
             //height is the length from the first value to second value of the value pair
             .attr("height", function(d){
                 return h - yScale(d) - chartPaddingAxis;
-            });
+            })
+            .style("fill", color(colorID));
 
         svg.selectAll("text")
             .data(dataset)
@@ -139,7 +140,7 @@ function BarChart(dataset){
         .attr("text-anchor", "middle")
         .style('font-size', "medium")
         .style("font-weight", "bold")
-        .text("Australia energy net export, consumption and production\n(in Petajoules)");
+        .text(chartTitle);
 }
 
 function ProductionLineChart(dataset){
@@ -331,7 +332,7 @@ function StackedBarChart(dataset){
         .attr("text-anchor", "middle")
         .style('font-size', "medium")
         .style("font-weight", "bold")
-        .text("Australia energy net export, consumption and production\n(in Petajoules)");
+        .text("Australia energy net export, consumption and production (in Petajoules)");
 }
 
 function Legend(dataset) {
@@ -384,11 +385,11 @@ d3.select("#productionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartProduction;
-
+        document.getElementById("productionToggleBtn").style.visibility = "hidden";
         //extracting the production data
         let productionData = importedData.map(d => d.production);
         SetUpXYScale(productionData);
-        BarChart(productionData);
+        BarChart(productionData, "Australia energy production (in Petajoules)", 3);
     }
 });
 
@@ -399,11 +400,11 @@ d3.select("#netExportBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartNetExport;
-
+        document.getElementById("productionToggleBtn").style.visibility = "hidden";
         //extracting the net export data
         let netExportData = importedData.map(d => d.netExport);
         SetUpXYScale(netExportData);
-        BarChart(netExportData);
+        BarChart(netExportData, "Australia energy net export (in Petajoules)", 1);
     }
 });
 
@@ -414,11 +415,11 @@ d3.select("#consumptionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartConsumption;
-
+        document.getElementById("productionToggleBtn").style.visibility = "hidden";
         //extracting the consumption data
         let consumptionData = importedData.map(d => d.consumption);
         SetUpXYScale(consumptionData);
-        BarChart(consumptionData);
+        BarChart(consumptionData, "Australia energy consumption (in Petajoules)", 2);
     }
 });
 
@@ -429,6 +430,8 @@ d3.select("#allBtn")
         currentChart = ChartAll;
         d3.selectAll("svg > *")
             .remove();
+
+        document.getElementById("productionToggleBtn").style.visibility = "visible";
 
         SetUpIntegratedXYScale(importedData);
         StackedBarChart(importedData);
