@@ -10,7 +10,8 @@ var chartPaddingAxis = 75; //padding for the axis' space
 var chartPaddingTop = 100; //padding top for the chart
 var chartPaddingRight = 200;
 var outerPadding = 0.5;
-var tooltipYOffset = 240;
+var tooltipOffset = 75;
+var dotRadius = 6;
 
 //button variables
 var productionDisplay = true;
@@ -26,7 +27,7 @@ var color = d3.scaleOrdinal()
             .range(["#4535aa", "#d6d1f5", "#b05cba"]);
 
 // Define the div for the tooltip box
-var divTooltip = d3.select("body").append("div")	
+var divTooltip = d3.select("section").append("div")	
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -178,8 +179,8 @@ function ProductionLineChart(dataset){
                             .duration(200)
                             .style("opacity", .9);
                     divTooltip.html(d.production)
-                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
-                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                            .style("left", (d3.select(this).attr("cx")) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipOffset) + "px");
                 }
                 })					
             .on("mouseout", function(d) {		
@@ -218,7 +219,7 @@ function ProductionLineChartIntegrated(dataset){
             .attr("cy", function(d, i){
                 return yScale(dataset[i].production);
             })
-            .attr("r", 6)
+            .attr("r", dotRadius)
             .attr("fill", color(3))
             .on("mouseover", function(event, d) {
                 if (productionDisplay)
@@ -227,8 +228,8 @@ function ProductionLineChartIntegrated(dataset){
                             .duration(200)
                             .style("opacity", .9);
                     divTooltip.html(d.production)
-                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
-                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                            .style("left", (d3.select(this).attr("cx") - 25) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) - tooltipOffset/2) + "px");
                 }
                 })
             .on("mouseout", function(d) {		
@@ -307,7 +308,7 @@ function StackedBarChart(dataset){
                         //putting in the values and reposition tooltip
                         divTooltip.html(d[1] - d[0])
                                     .style("left", d3.select(this).attr("x") + "px")
-                                    .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipYOffset ) + "px");
+                                    .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipOffset ) + "px");
                     })
                     .on("mouseout", function(d) {
                         //removing the existing tooltip
@@ -385,7 +386,7 @@ d3.select("#productionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartProduction;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        document.getElementById("productionToggleBtn").style.display = "none";
         //extracting the production data
         let productionData = importedData.map(d => d.production);
         SetUpXYScale(productionData);
@@ -400,7 +401,7 @@ d3.select("#netExportBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartNetExport;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        document.getElementById("productionToggleBtn").style.display = "none";
         //extracting the net export data
         let netExportData = importedData.map(d => d.netExport);
         SetUpXYScale(netExportData);
@@ -415,7 +416,7 @@ d3.select("#consumptionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartConsumption;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        document.getElementById("productionToggleBtn").style.display = "none";
         //extracting the consumption data
         let consumptionData = importedData.map(d => d.consumption);
         SetUpXYScale(consumptionData);
@@ -431,7 +432,7 @@ d3.select("#allBtn")
         d3.selectAll("svg > *")
             .remove();
 
-        document.getElementById("productionToggleBtn").style.visibility = "visible";
+        document.getElementById("productionToggleBtn").style.display = "block";
 
         SetUpIntegratedXYScale(importedData);
         StackedBarChart(importedData);
