@@ -71,164 +71,158 @@ function choropleth(){
             .text(function (d, i) { return legend_labels[i]; });
 
 
-		for (var i = 0; i < data.length; i++) {
-	
-			
-			var data_state = data[i].state;
-			
-			
-			var dataValue = parseFloat(data[i].amount);
-			
-			
-			for (var j = 0; j < json.features.length; j++) {
-			
-				var json_state = json.features[j].properties.STATE_NAME;
-				
-				if (data_state == json_state) {
-			
-					
-					json.features[j].properties.value = dataValue;
-					
-			
-					break;
-					
+	for (var i = 0; i < data.length; i++) {
+		var data_state = data[i].state;			
+		var dataValue = parseFloat(data[i].amount);
+
+		for (var j = 0; j < json.features.length; j++) {
+		var json_state = json.features[j].properties.STATE_NAME;
+
+		if (data_state == json_state) {			
+			json.features[j].properties.value = dataValue;
+			break;
+
 				}
 			}		
 		}
-		
-		svg.selectAll("g.state")
-					.data(json.features)
-					.enter()
-					
-			.append("path")
-			.attr("stroke", "white")
-			.attr("d", path)
-			.on("mouseover", function (event,d) {
-				
-				tooltip.transition()
-					.duration(200)
-					.style("opacity", 1);
-				tooltip.html(d.properties.value)
-					.style("left", event.pageX + "px")
-					.style("top", event.pageY + "px")
-					.style("fill", "black");
+
+	svg.selectAll("g.state")
+		.data(json.features)
+		.enter()
+
+		.append("path")
+		.attr("stroke", "white")
+		.attr("d", path)
+		.on("mouseover", function (event,d) {
+
+			tooltip.transition()
+				.duration(200)
+				.style("opacity", 1);
+			tooltip.html(d.properties.value)
+				.style("left", event.pageX + "px")
+				.style("top", event.pageY + "px")
+				.style("fill", "black");
 			})
-			.on("mouseout", function (d) {
-				tooltip.transition()
-					.duration(200)
-					.style("opacity", 0);
+		.on("mouseout", function (d) {
+			tooltip.transition()
+				.duration(200)
+				.style("opacity", 0);
+		})
+		.on("click", function(d){
+			d3.csv("./data/Energy_mix_by_states.csv").then(function(data){
+			pieChart(data);
 			})
-			.on("click", function(d){
-				d3.csv("./data/Energy_mix_by_states.csv").then(function(data,i){
-					pieChart(data,i);
-				})
-			})
-			.style("fill", function(d) {
-			
-				var value = d.properties.value;
-							
-				if (value) {
-					
-					return color(value);
-				} else {
-					
-					return "grey";
-				}
-			})
-			;
-			
-			
-		
-		
+		})
+		.style("fill", function(d) {
+
+		var value = d.properties.value;
+
+			if (value) {
+
+				return color(value);
+			} else {
+
+				return "grey";
+			}
+		})
+		;
+
+
+
+
 		svg.selectAll("g.state")
 			.data(json.features)
 			.enter()
-		    .append("text")
-		    .attr("fill", "white")
-		    .style("font-size", "12px")
-		    .attr("transform", d => { return "translate(" + path.centroid(d) + ")"; })
-		    .attr("text-anchor", "middle")
-		    .attr("dy", 15)
-		    .text(function(d){return d.properties.STATE_NAME;});
-			
-		function pieChart(data,i){
-				
-				var width = 350;
-				var	height = 350;
-				var outerRadius = width /2;
-				var	innerRadius = 0;
-				var arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
-				var pie = d3.pie();
-				var colour = d3.scaleOrdinal(d3.schemeCategory10);
-				var svg = d3.select("body")
-							.append("svg")
-							.attr("width", width)
-							.attr("height", height);
-				
-				for (var i = 0; i < data.length; i++) {
+			.append("text")
+			.attr("fill", "white")
+			.style("font-size", "12px")
+			.attr("transform", d => { return "translate(" + path.centroid(d) + ")"; })
+			.attr("text-anchor", "middle")
+			.attr("dy", 15)
+			.text(function(d){return d.properties.STATE_NAME;});
+
+	//Pie chart for the selected region
+	function pieChart(data){
+
+		var width = 350;
+		var	height = 350;
+		var outerRadius = width /2;
+		var	innerRadius = 0;
+		var arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
+		var pie = d3.pie();
+		var colour = d3.scaleOrdinal(d3.schemeCategory10);
+		var svg = d3.select("body")
+					.append("svg")
+					.attr("width", width)
+					.attr("height", height);
+		var dataList = [];
+
+		for (var i = 0; i < data.length; i++) {
 
 
-					var data_state = data[i].state;
-					
-					
-					var data_coal = parseFloat(data[i].coal);
-					var data_oil = parseFloat(data[i].oil);
-					var data_gas = parseFloat(data[i].gas);
-					var data_renewables = parseFloat(data[i].data_renewables);
-					
-					
-					for (var j = 0; j < json.features.length; j++) {
-					
-						var json_state = json.features[j].properties.STATE_NAME;
-						
-						if (data_state == json_state) {
-					
-							
-							json.features[j].properties.coal = data_coal;
-							json.features[j].properties.oil = data_oil;
-							json.features[j].properties.gas = data_gas;
-							json.features[j].properties.renewables = data_renewables;
-							
-					
-							break;
-							
-						}
-						
-					}		
-				}	
-				
-				
-				//Arc groups
-				
-				var arcs = svg.selectAll("g.arc")
-							.data(pie(data))
-							.enter()
-							.append("g")
-							.attr("class", "arc")
-							.attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+			var data_state = data[i].state;
 
-				//Arc paths
-				arcs.append("path")
-					.attr("fill", function(d, i) {
-					return colour(i);
-					})
-					.attr("d", arc);
 
-				//Labels
-				arcs.append("text")
-					.attr("transform", function(d) {
-					return "translate(" + arc.centroid(d) + ")";
-					})
-					.attr("text-anchor", "middle")
-					.text(function(d) {
-					return d.value;
-					});
-							
+			var data_coal = parseFloat(data[i].coal);
+			var data_oil = parseFloat(data[i].oil);
+			var data_gas = parseFloat(data[i].gas);
+			var data_renewables = parseFloat(data[i].renewables);
+
+			//bind data to the states
+			for (var j = 0; j < json.features.length; j++) {
+
+				var json_state = json.features[j].properties.STATE_NAME;
+
+				if (data_state == json_state) {
+
+
+					json.features[j].properties.coal = data_coal;
+					json.features[j].properties.oil = data_oil;
+					json.features[j].properties.gas = data_gas;
+					json.features[j].properties.renewables = data_renewables;
+
+					dataList.push([json.features[j].properties.coal,json.features[j].properties.oil,
+						json.features[j].properties.gas,json.features[j].properties.renewables]);
+
+					break;
+
 				}
 
-							
-					});
-					
+			}		
+		}	
+
+
+		//Arc groups
+
+		var arcs = svg.selectAll("g.arc")
+					.data(pie(dataList[5])) //replace 5 with the index (?) of whatever is clicked on
+					.enter()
+					.append("g")
+					.attr("class", "arc")
+					.attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+		//Arc paths
+		arcs.append("path")
+			.attr("fill", function(d, i) {
+			return colour(i);
+			})
+			.attr("d", arc);
+
+		//Labels
+		arcs.append("text")
+			.attr("transform", function(d) {
+			return "translate(" + arc.centroid(d) + ")";
+			})
+			.attr("text-anchor", "middle")
+			.text(function(d) {
+			return d.value;
+			});
+
+		}
+
+
+		});
+
 
 
 	})
