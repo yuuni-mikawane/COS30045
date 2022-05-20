@@ -72,24 +72,14 @@ function choropleth(){
 
 
 		for (var i = 0; i < data.length; i++) {
-	
-			
-			var data_state = data[i].state;
-			
-			
+			var data_state = data[i].state;			
 			var dataValue = parseFloat(data[i].amount);
-			
-			
+					
 			for (var j = 0; j < json.features.length; j++) {
-			
 				var json_state = json.features[j].properties.STATE_NAME;
 				
-				if (data_state == json_state) {
-			
-					
+				if (data_state == json_state) {			
 					json.features[j].properties.value = dataValue;
-					
-			
 					break;
 					
 				}
@@ -119,8 +109,8 @@ function choropleth(){
 					.style("opacity", 0);
 			})
 			.on("click", function(d){
-				d3.csv("./data/Energy_mix_by_states.csv").then(function(data,i){
-					pieChart(data,i);
+				d3.csv("./data/Energy_mix_by_states.csv").then(function(data){
+					pieChart(data);
 				})
 			})
 			.style("fill", function(d) {
@@ -150,8 +140,9 @@ function choropleth(){
 		    .attr("text-anchor", "middle")
 		    .attr("dy", 15)
 		    .text(function(d){return d.properties.STATE_NAME;});
-			
-		function pieChart(data,i){
+		
+		//Pie chart for the selected region
+		function pieChart(data){
 				
 				var width = 350;
 				var	height = 350;
@@ -164,7 +155,8 @@ function choropleth(){
 							.append("svg")
 							.attr("width", width)
 							.attr("height", height);
-				
+				var dataList = [];
+
 				for (var i = 0; i < data.length; i++) {
 
 
@@ -174,9 +166,9 @@ function choropleth(){
 					var data_coal = parseFloat(data[i].coal);
 					var data_oil = parseFloat(data[i].oil);
 					var data_gas = parseFloat(data[i].gas);
-					var data_renewables = parseFloat(data[i].data_renewables);
+					var data_renewables = parseFloat(data[i].renewables);
 					
-					
+					//bind data to the states
 					for (var j = 0; j < json.features.length; j++) {
 					
 						var json_state = json.features[j].properties.STATE_NAME;
@@ -189,7 +181,9 @@ function choropleth(){
 							json.features[j].properties.gas = data_gas;
 							json.features[j].properties.renewables = data_renewables;
 							
-					
+							dataList.push([json.features[j].properties.coal,json.features[j].properties.oil,
+								json.features[j].properties.gas,json.features[j].properties.renewables]);
+							
 							break;
 							
 						}
@@ -201,7 +195,7 @@ function choropleth(){
 				//Arc groups
 				
 				var arcs = svg.selectAll("g.arc")
-							.data(pie(data))
+							.data(pie(dataList[5])) //replace 5 with the index (?) of whatever is clicked on
 							.enter()
 							.append("g")
 							.attr("class", "arc")
