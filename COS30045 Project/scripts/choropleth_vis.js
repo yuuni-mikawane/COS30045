@@ -179,8 +179,7 @@ function choropleth(){
 								.append("svg")
 								.attr("width", width)
 								.attr("height", height)
-								.attr("x", width)-100
-								.attr("y", height);
+								
 
 					//create a group of arcs
 					var arcs = svg.selectAll("g.arc")

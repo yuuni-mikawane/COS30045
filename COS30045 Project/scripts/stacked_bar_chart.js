@@ -6,14 +6,44 @@ var yearBand;
 var w = 750;
 var h = 600;
 var barPadding = 0.3; //padding between bars
-var chartPaddingAxis = 75; //padding for the axis' space
+var chartPaddingAxis = 125; //padding for the axis' space
 var chartPaddingTop = 100; //padding top for the chart
 var chartPaddingRight = 200;
 var outerPadding = 0.5;
-var tooltipYOffset = 240;
+var tooltipOffset = 75;
+var dotRadius = 6;
 
 //button variables
 var productionDisplay = true;
+
+var productionToggleBtn = document.getElementById("productionToggleBtn");
+var productionBtn = document.getElementById("productionBtn");
+var netExportBtn = document.getElementById("netExportBtn");
+var consumptionBtn = document.getElementById("consumptionBtn");
+var allBtn = document.getElementById("allBtn");
+
+//button reset
+function ButtonStyleReset() {
+    productionBtn.style.backgroundColor = "white";
+    productionBtn.style.color = "black";
+    netExportBtn.style.backgroundColor = "white";
+    netExportBtn.style.color = "black";
+    consumptionBtn.style.backgroundColor = "white";
+    consumptionBtn.style.color = "black";
+    allBtn.style.backgroundColor = "white";
+    allBtn.style.color = "black";
+    if (productionDisplay === true)
+    {
+        productionToggleBtn.style.backgroundColor = "#a7ff7f";
+        productionToggleBtn.style.color = "black";
+    }
+}
+
+//doing this for a reset at the start, and set current highlighted button to AllChart
+ButtonStyleReset();
+allBtn.style.backgroundColor = "black";
+allBtn.style.color = "white";
+
 //chart enums
 const ChartAll = 0;
 const ChartProduction = 1;
@@ -26,7 +56,7 @@ var color = d3.scaleOrdinal()
             .range(["#4535aa", "#d6d1f5", "#b05cba"]);
 
 // Define the div for the tooltip box
-var divTooltip = d3.select("body").append("div")	
+var divTooltip = d3.select("section").append("div")	
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -79,6 +109,29 @@ function SetUpIntegratedXYScale(dataset){
                     .range([h - chartPaddingAxis, chartPaddingTop]);
 }
 
+//chart labels XY
+function ChartLabel() {
+    //chart label X
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", w/2)
+        .attr("y", h - chartPaddingAxis/2)
+        .text("Year")
+        .style("font-weight", "bold");
+
+    //chart label Y
+    svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("x", -200)
+        .attr("y", chartPaddingAxis*0.25)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90)")
+        .text("Amount of energy in Petajoules")
+        .style("font-weight", "bold");
+}
+
 function BarChart(dataset, chartTitle, colorID){
     //axis declaration
     var xAxis = d3.axisBottom()
@@ -127,7 +180,14 @@ function BarChart(dataset, chartTitle, colorID){
     //have to put axis at the end, or the other SVGs will overlap the axis
     svg.append("g")
         .attr("transform", "translate(0, " + (h - chartPaddingAxis) + ")")
-        .call(xAxis);
+        .call(xAxis)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 10)
+        .attr("dy", "-5.1em")
+        .attr("text-anchor", "end")
+        .attr("stroke", "black")
+        .text("Amount of energy (Petajoules - PJ)");
 
     svg.append("g")
         .attr("transform", "translate(" + chartPaddingAxis + ", 0)")
@@ -136,11 +196,13 @@ function BarChart(dataset, chartTitle, colorID){
     //all chart title
     svg.append('text')
         .attr("x", (w / 2))
-        .attr("y", (chartPaddingAxis / 2))
+        .attr("y", (chartPaddingAxis / 2 - 20))
         .attr("text-anchor", "middle")
         .style('font-size', "medium")
         .style("font-weight", "bold")
         .text(chartTitle);
+
+    ChartLabel();
 }
 
 function ProductionLineChart(dataset){
@@ -178,8 +240,8 @@ function ProductionLineChart(dataset){
                             .duration(200)
                             .style("opacity", .9);
                     divTooltip.html(d.production)
-                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
-                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                            .style("left", (d3.select(this).attr("cx")) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipOffset) + "px");
                 }
                 })					
             .on("mouseout", function(d) {		
@@ -218,7 +280,7 @@ function ProductionLineChartIntegrated(dataset){
             .attr("cy", function(d, i){
                 return yScale(dataset[i].production);
             })
-            .attr("r", 6)
+            .attr("r", dotRadius)
             .attr("fill", color(3))
             .on("mouseover", function(event, d) {
                 if (productionDisplay)
@@ -227,8 +289,8 @@ function ProductionLineChartIntegrated(dataset){
                             .duration(200)
                             .style("opacity", .9);
                     divTooltip.html(d.production)
-                            .style("left", (d3.select(this).attr("cx") - 30) + "px")
-                            .style("top", (parseFloat(d3.select(this).attr("cy")) + tooltipYOffset * 0.55) + "px");
+                            .style("left", (d3.select(this).attr("cx") - 25) + "px")
+                            .style("top", (parseFloat(d3.select(this).attr("cy")) - tooltipOffset/2) + "px");
                 }
                 })
             .on("mouseout", function(d) {		
@@ -307,7 +369,7 @@ function StackedBarChart(dataset){
                         //putting in the values and reposition tooltip
                         divTooltip.html(d[1] - d[0])
                                     .style("left", d3.select(this).attr("x") + "px")
-                                    .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipYOffset ) + "px");
+                                    .style("top", (parseFloat(d3.select(this).attr("y")) + tooltipOffset ) + "px");
                     })
                     .on("mouseout", function(d) {
                         //removing the existing tooltip
@@ -328,15 +390,61 @@ function StackedBarChart(dataset){
     //all chart title
     svg.append('text')
         .attr("x", (w / 2))
-        .attr("y", (chartPaddingAxis / 2))
+        .attr("y", (chartPaddingAxis / 2 - 20))
         .attr("text-anchor", "middle")
         .style('font-size', "medium")
         .style("font-weight", "bold")
         .text("Australia energy net export, consumption and production (in Petajoules)");
+
+    ChartLabel();
 }
 
 function Legend(dataset) {
+    // Handmade legend
+    svg.append("rect")
+        .attr("x", w - chartPaddingAxis * 1.2 - 10)
+        .attr("y", h/2 - 50)
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", color(3))
+        .style("stroke", "black");
 
+    svg.append("rect")
+        .attr("x", w - chartPaddingAxis * 1.2 - 10)
+        .attr("y", h/2 - 10)
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", color(1))
+        .style("stroke", "black");
+
+    svg.append("rect")
+        .attr("x", w - chartPaddingAxis * 1.2 - 10)
+        .attr("y", h/2 + 30)
+        .attr("width", 20)
+        .attr("height", 20)
+        .style("fill", color(2))
+        .style("stroke", "black");
+
+    svg.append("text")
+        .attr("x", w - chartPaddingAxis * 1.2 + 20)
+        .attr("y", h/2 - 40)
+        .text("Production")
+        .style("font-size", "15px")
+        .attr("alignment-baseline","middle");
+
+    svg.append("text")
+        .attr("x", w - chartPaddingAxis * 1.2 + 20)
+        .attr("y", h/2)
+        .text("Net Export")
+        .style("font-size", "15px")
+        .attr("alignment-baseline","middle");
+
+    svg.append("text")
+        .attr("x", w - chartPaddingAxis * 1.2 + 20)
+        .attr("y", h/2 + 40)
+        .text("Consumption")
+        .style("font-size", "15px")
+        .attr("alignment-baseline","middle");
 }
 
 function DrawSVGAll(){
@@ -368,11 +476,13 @@ d3.select("#productionToggleBtn")
         if(productionDisplay !== true)
         {
             EnableProductionLineChart();
+            productionToggleBtn.style.backgroundColor = "#a7ff7f";
             productionDisplay = true;
         }
         else
         {
             DisableProductionLineChart();
+            productionToggleBtn.style.backgroundColor = "white";
             productionDisplay = false;
         }
     }
@@ -385,7 +495,10 @@ d3.select("#productionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartProduction;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        productionToggleBtn.style.display = "none";
+        ButtonStyleReset();
+        productionBtn.style.backgroundColor = "black";
+        productionBtn.style.color = "white";
         //extracting the production data
         let productionData = importedData.map(d => d.production);
         SetUpXYScale(productionData);
@@ -400,7 +513,10 @@ d3.select("#netExportBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartNetExport;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        productionToggleBtn.style.display = "none";
+        ButtonStyleReset();
+        netExportBtn.style.backgroundColor = "black";
+        netExportBtn.style.color = "white";
         //extracting the net export data
         let netExportData = importedData.map(d => d.netExport);
         SetUpXYScale(netExportData);
@@ -415,7 +531,10 @@ d3.select("#consumptionBtn")
         d3.selectAll("svg > *")
             .remove();
         currentChart = ChartConsumption;
-        document.getElementById("productionToggleBtn").style.visibility = "hidden";
+        productionToggleBtn.style.display = "none";
+        ButtonStyleReset();
+        consumptionBtn.style.backgroundColor = "black";
+        consumptionBtn.style.color = "white";
         //extracting the consumption data
         let consumptionData = importedData.map(d => d.consumption);
         SetUpXYScale(consumptionData);
@@ -430,8 +549,12 @@ d3.select("#allBtn")
         currentChart = ChartAll;
         d3.selectAll("svg > *")
             .remove();
+        productionDisplay = true;
 
-        document.getElementById("productionToggleBtn").style.visibility = "visible";
+        productionToggleBtn.style.display = "block";
+        ButtonStyleReset();
+        allBtn.style.backgroundColor = "black";
+        allBtn.style.color = "white";
 
         SetUpIntegratedXYScale(importedData);
         StackedBarChart(importedData);
