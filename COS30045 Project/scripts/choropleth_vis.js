@@ -5,7 +5,7 @@ function init(){
 function choropleth(){
 	//initialise variables needed for the elements in the vis
 	var width = 1000;
-	var height = 800;
+	var height = 750;
 
 	var projection = d3.geoMercator().center([120, -28.5])
 					   .translate([width/2, height/2])
@@ -58,7 +58,7 @@ function choropleth(){
 				
 				legend.append("text")
 					  .attr("x", width * 0.15)
-					  .attr("y", height/2 - 100)
+					  .attr("y", height/2 - 80)
 					  .attr("fill", "black")
 					  .text("Total Energy Consumption (PJ)");
 					 
@@ -142,9 +142,10 @@ function choropleth(){
 							pieChart(d);
 							exist = true;
 						}else{
-							for(i=0; i<4;i++){
-							d3.select(".pie_chart").remove();
-							}
+							d3.select("#pie_svg").remove();
+							
+							
+							
 						}
 						pieChart(d);
 					})
@@ -168,33 +169,39 @@ function choropleth(){
 				
 				//create a pie chart displaying the energy mix for the selected region
 				function pieChart(d){
-					var width = 350;
-					var	height = 350;
-					var outerRadius = width /2;
+					
+					var width = 900;
+					var	height = 400;
+					var outerRadius = width/5 - 20;
 					var	innerRadius = 0;
 					var arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
 					var pie = d3.pie();
 					var colour = d3.scaleOrdinal(d3.schemeCategory10);
-					var svg = d3.select("body")
+					var dataList = [d.properties.coal, d.properties.oil, d.properties.gas,d.properties.renewables];
+					var svg = d3.select("p")
 								.append("svg")
+								.attr("id", "pie_svg")
 								.attr("width", width)
 								.attr("height", height)
 								
 
 					//create a group of arcs
 					var arcs = svg.selectAll("g.arc")
-							.data(pie([d.properties.coal, d.properties.oil, d.properties.gas,d.properties.renewables])) 
+							.data(pie(dataList)) 
 							.enter()
 							.append("g")
 							.attr("class", "pie_chart")
-							.attr("transform", "translate(" + outerRadius + "," + outerRadius + ")")
+							.attr("transform", "translate(" + 420 + "," + 200 + ")")
+							
 							;
 					
 					//create arc paths
 					arcs.append("path")
+						
 						.attr("fill", function(d, i) {
 							return colour(i);
 						})
+						
 						.attr("d", arc);
 
 					//create labels for each wedge
@@ -203,12 +210,52 @@ function choropleth(){
 						return "translate(" + arc.centroid(d) + ")";
 						})
 						.attr("text-anchor", "middle")
+						.attr("fill", "white")
 						.text(function(d) {
+							
 						return d.value;
 						});
-							
+			
+					//create a color legend for the pie chart
+					var pie_legend = svg.selectAll("p").data(dataList).enter()
+									.append("g");
+					
+					var pie_legend_labels = ["Renewables", "Gas", "Oil", "Coal"];
+					var pie_legend_width = 30;
+					var pie_legend_height = 40;
+
+					pie_legend.append("rect")
+							  .attr("height", pie_legend_height)
+							  .attr("width", pie_legend_width)
+							  .attr("x", width/2 + 200)
+							  .attr("y", function(d,i){
+								  return 300 - pie_legend_height * (i+2) ;
+							  })
+							  .attr("fill", (d,i) => colour(i));
+					
+					pie_legend.append("text")
+							  .attr("x", width/2 + 250)
+							  .attr("y", function(d,i){
+								  return pie_legend_height * (i+1) +90;
+							  })
+							  .attr("fill", "black")
+							  .text((d,i) => pie_legend_labels[i]);
+				
+					pie_legend.append("text")
+							.attr("x", width/2)
+							.attr("y", 20)
+							.attr("fill", "black")
+							.text("ENERGY MIX, 2019-2020");
+
+					//scroll to the bottom of the page where the pie chart is located
+					window.scrollTo(0, document.body.scrollHeight);
+					
 				  } 
+				window.onscroll = scrollFunction;
+
 				})
+
+				
 			})
 		})
 	}
@@ -218,3 +265,5 @@ function choropleth(){
 
 
 window.onload = init;
+
+
