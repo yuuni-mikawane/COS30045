@@ -251,8 +251,7 @@ function choropleth(){
 					window.scrollTo(0, document.body.scrollHeight);
 					
 				  } 
-				window.onscroll = scrollFunction;
-
+				
 				})
 
 				
