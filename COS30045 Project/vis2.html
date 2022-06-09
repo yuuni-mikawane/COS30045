@@ -16,14 +16,50 @@
     <header>
       <nav>
         <ul class="links">
-          
-          <li><a href="vis1.html" target="_self">Total Energy Consumption</a></li>
+          <li>
+            <a href="vis1.html" target="_self">Total Energy Consumption</a>
+          </li>
           <!--Need to change the name of the page later, now just for reference-->
-          <li><a href="vis2.html" target="_self">Vis2</a></li>
+          <li>
+            <a href="vis2.html" target="_self"
+              >Net Export, Production and Consumption</a
+            >
+          </li>
         </ul>
       </nav>
     </header>
-    <h1>Visualisation 2</h1>
+    <h2 style="line-height: 100%; padding: 1.5em">
+      Australia's Energy Net Export, Consumption and Production, 2014-2020
+    </h2>
+    <div class="explanation-text">
+      <!-- <p>
+        The overall Net Export and Production of energy in Australia has been on
+        the rise in recent years. The Consumption rate seems to stay the same,
+        barely fluctuated for the past 5 years. Notice how the amount of energy
+        produced remained almost equal to the amount of Net Export and
+        Consumption combined, it is reasonable to say that the planning for
+        importing/exporting of Australia was stable, and barely any importing of
+        energy was needed. The growth portrayed by the charts also mean that
+        Australia's effort in managing and producing energy is proving to be
+        effective, bringing in more money over the course of 5 years.
+      </p> -->
+      <p>
+        The provided buttons switch between the detailed charts for each
+        category of energy measurement, and a combined version of all categories
+        for an overall view of the growth in recent years.
+      </p>
+      <p>Click on the desired button corresponding to a chart to view them.</p>
+      <p>
+        While viewing the combined chart, you can toggle on or off for the
+        Production line by clicking the
+        <b>Production Visibility</b> button.
+      </p>
+      <p>
+        Specifically for the combined chart, hover over the bars or a dot on the
+        Production line to see the detailed number for that element.
+      </p>
+    </div>
+
     <div>
       <div class="svgChart">
         <button class="btn-0" id="productionBtn">Production Chart</button>
@@ -38,6 +74,12 @@
         <section class="svg"></section>
       </div>
     </div>
+
+    <p class="source">
+      The charts used data sourced from Australian Government's Department of
+      Industry, Science, Energy and Resources.
+    </p>
+
     <footer class="footer">
       <h3>COS30045 - Data Visualisation</h3>
     </footer>

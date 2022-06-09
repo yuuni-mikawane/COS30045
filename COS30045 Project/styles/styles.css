@@ -49,9 +49,8 @@ ul, ol{
 /*Style the menu*/
 nav {
     width: 100%;
-    height: 110px;
+    height: 80px;
     
-    line-height: 75px;
     background-color: #5d5f5f ;
     display: flex;
     justify-content:center;
@@ -59,9 +58,36 @@ nav {
     
 }
 
+.explanation-text{
+    padding: 0%;
+    padding-right: 20%;
+    padding-left: 20%;
+}
+
+.explanation-text p{
+    font-size: 18px;
+    padding: 0%;
+    margin: 1em;
+}
+
+.source {
+    display: flex;
+    padding: 0%;
+    margin: 0%;
+    font-size: 16px;
+    font-style: italic;
+    padding-bottom: 3em;
+    justify-content: center;
+}
+
+b {
+    font-weight: bold;
+    font-size: 18px;
+}
+
 .links a{
     float:left;
-    text-align:left;
+    text-align:center;
     text-decoration:none;
     padding: 20px;
     color: rgb(243, 242, 242);
@@ -70,21 +96,25 @@ nav {
     
 }
 
-.links li{list-style: none; display: inline-block;}
+.links li{
+    list-style: none;
+    display: inline-block;
+
+}
 
 
 
-.links a.active, .links a:hover {
+/* .links a.active, .links a:hover {
     color: rgb(4, 196, 100);
     background-color: rgb(63, 61, 61);
     transition: .5s;
     border-radius: 5px;
     padding: 7px 13px;
-} 
+}  */
 
 /*index page styling*/
 .index_page {
-    background-image: url(./images/background_indexpage.jpg);
+    /* background-image: url(./images/background_indexpage.jpg); */
     background-repeat: repeat;
     background-color: #f5f5f5;
 }

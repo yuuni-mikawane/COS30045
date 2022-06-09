@@ -53,7 +53,7 @@ function choropleth(){
 					  .attr("height", legend_height)
 					  .attr("width", legend_width)
 					  .attr("x", width/5 - 20)
-					  .attr("y", 250 - legend_height +7 )
+					  .attr("y", 250 - legend_height )
 					  .style("fill", "#ccc");
 				
 				legend.append("text")

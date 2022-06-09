@@ -1,55 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset ="utf-8"/>
-    <meta name="description" content="Index Page"/>
-    <meta name="keywords" content="index, page, html5, css"/>
-    <meta name="author" content="Tran Bao Khanh Nguyen, Hai Long Pham"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="Index Page" />
+    <meta name="keywords" content="index, page, html5, css" />
+    <meta name="author" content="Tran Bao Khanh Nguyen, Hai Long Pham" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vis 1</title>
-      <!-- References to external CSS files -->
-    <link href="styles/styles.css" rel="stylesheet"/>
-	<script src="https://d3js.org/d3.v7.min.js"></script>
-	<script src="scripts/choropleth_vis.js"></script>
-</head>
-<body class="index_page">
+    <!-- References to external CSS files -->
+    <link href="styles/styles.css" rel="stylesheet" />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="scripts/choropleth_vis.js"></script>
+  </head>
+  <body class="index_page">
     <!--navigation bar and logo-->
     <header>
-        
-        <nav>
-            
-            
-            <ul class="links">
-                
-                <li><a  href="vis1.html" target="_self">Total Energy Consumption</a></li> <!--Need to change the name of the page later, now just for reference-->
-                <li><a  href="vis2.html" target="_self">Vis2</a></li>
-            
-            </ul>
-        </nav>
-        
+      <nav>
+        <ul class="links">
+          <li>
+            <a href="vis1.html" target="_self">Total Energy Consumption</a>
+          </li>
+          <!--Need to change the name of the page later, now just for reference-->
+          <li>
+            <a href="vis2.html" target="_self"
+              >Net Export, Production and Consumption</a
+            >
+          </li>
+        </ul>
+      </nav>
     </header>
-    
-    <section>
-        
-        <h2 style="line-height: 100%; padding:1.5em;">Total Energy Consumption By State And Territory, 2019-2020 </h2>
-        <p >Energy plays an important role in the lives of humans and the development of the economy. Therefore, energy consumption
-            per capita indicates the extent to which the economy and society have developed. Through this visualisation, users can 
-            be informed on the total energy consumption for almost all of the states and territories in Australia by observing
-            the saturation level of red corresponding to a PJ range for each state. It is hoped that this visualisation will provide users
-            with refined, clear, and easily accessible information, and thus help them make more informed decisions.
-        <br>
-        <p style="font-style: italic;">Hover over a region to see total energy consumption or click to see more information on energy mix!</p>
-        </p>
-		<p id="vis1-map"></p>
-        <p id="vis1-pie"></p>
-        
 
-        
+    <section>
+      <h2 style="line-height: 100%; padding: 1.5em">
+        Total Energy Consumption By State And Territory, 2019-2020
+      </h2>
+      <div class="explanation-text">
+        <p>
+          Energy plays an important role in the lives of humans and the
+          development of the economy. Therefore, energy consumption per capita
+          indicates the extent to which the economy and society have developed.
+          Through this visualisation, users can be informed on the total energy
+          consumption for almost all of the states and territories in Australia
+          by observing the saturation level of red corresponding to a PJ range
+          for each state. It is hoped that this visualisation will provide users
+          with refined, clear, and easily accessible information, and thus help
+          them make more informed decisions. <br />
+        </p>
+
+        <p style="font-style: italic">
+          Hover over a region to see total energy consumption or click to see
+          more information on energy mix!
+        </p>
+      </div>
+      <p id="vis1-map"></p>
+      <p id="vis1-pie"></p>
     </section>
     <footer class="footer">
-        
-        <h3>COS30045 - Data Visualisation</h3>
-        
+      <h3>COS30045 - Data Visualisation</h3>
     </footer>
-</body>
+  </body>
 </html>
