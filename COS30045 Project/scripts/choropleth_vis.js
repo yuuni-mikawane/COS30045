@@ -4,8 +4,8 @@ function init(){
 
 function choropleth(){
 	//initialise variables needed for the elements in the vis
-	var width = 1000;
-	var height = 750;
+	var width = 950;
+	var height = 650;
 
 	var projection = d3.geoMercator().center([120, -28.5])
 					   .translate([width/2, height/2])
@@ -58,13 +58,13 @@ function choropleth(){
 				
 				legend.append("text")
 					  .attr("x", width * 0.15)
-					  .attr("y", height/2 - 80)
+					  .attr("y", height/2 - 40)
 					  .attr("fill", "black")
 					  .text("Total Energy Consumption (PJ)");
 					 
 				legend.append("text")
 					  .attr("x", width/3 - 100)
-					  .attr("y", height/4 + 50)
+					  .attr("y", height/4 + 75)
 					  .attr("font-weight", "normal")
 					  .attr("fill", "black")
 					  .text("Undefined");
@@ -169,9 +169,6 @@ function choropleth(){
 				
 				//create a pie chart displaying the energy mix for the selected region
 				function pieChart(d){
-					
-					var width = 900;
-					var	height = 400;
 					var outerRadius = width/5 - 20;
 					var	innerRadius = 0;
 					var arc = d3.arc().innerRadius(innerRadius).outerRadius(outerRadius);
@@ -182,7 +179,7 @@ function choropleth(){
 								.append("svg")
 								.attr("id", "pie_svg")
 								.attr("width", width)
-								.attr("height", height)
+								.attr("height", height * 0.6)
 								
 
 					//create a group of arcs
@@ -240,14 +237,44 @@ function choropleth(){
 							  })
 							  .attr("fill", "black")
 							  .text((d,i) => pie_legend_labels[i]);
-				
+					
+					//generating state name
+					let stateName = "";
+					switch(d.properties.STATE_NAME)
+					{
+						case "WA":
+							stateName = "West Australia";
+							break;
+						case "NT":
+							stateName = "Northern Territory";
+							break;
+						case "SA":
+							stateName = "South Australia";
+							break;
+						case "QLD":
+							stateName = "Queensland";
+							break;
+						case "NSW":
+							stateName = "New South Wales";
+							break;
+						case "TAS":
+							stateName = "Tasmania";
+							break;
+						case "VIC":
+							stateName = "Victoria";
+							break;
+						case "ACT":
+							stateName = "Australian Capital Territory";
+							break;
+					}
+
 					pie_legend.append("text")
 							.attr("x", width/4)
 							.attr("y", 15)
 							.attr("fill", "black")
 							.style("font-size", "20px")
 							.style("font-weight", "bold")
-							.text("ENERGY MIX BY STATE AND TERRITORY, 2019-2020")
+							.text("Energy mix in " + stateName + ", 2019-2020 (Petajoules)")
 							;
 					
 

@@ -69,7 +69,7 @@ var svg = d3.select("section")
             .append("svg")
             .attr("width", w)
             .attr("height", h)
-            .style("background", "white");
+            .style("background", "#f5f5f5");
 
 //XY scale variable
 var xScale;
