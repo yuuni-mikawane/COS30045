@@ -9,6 +9,10 @@
     
     
 }
+p{
+    margin: 40px;
+    margin-left:60px;
+}
 h1,h2 {text-align: center;
     text-transform: uppercase;
     font-weight: bold;
@@ -55,23 +59,14 @@ nav {
     
 }
 
-.links{
-    display: flex;
-    justify-content: center;
-    gap: 50px;
-    width: 200px;
-    margin: 0px;
-    padding: 0px;
-    float: right;
-   
-}
 .links a{
     float:left;
-    text-align:center;
+    text-align:left;
     text-decoration:none;
+    padding: 20px;
     color: rgb(243, 242, 242);
     font-size: 14px;
-    text-transform: uppercase;
+    
     
 }
 
@@ -79,13 +74,13 @@ nav {
 
 
 
-/* .links a.active, .links a:hover {
+.links a.active, .links a:hover {
     color: rgb(4, 196, 100);
     background-color: rgb(63, 61, 61);
     transition: .5s;
     border-radius: 5px;
     padding: 7px 13px;
-} */
+} 
 
 /*index page styling*/
 .index_page {
@@ -152,3 +147,4 @@ div.tooltip {
     font-size: 16px;
     cursor: pointer;
 }
+

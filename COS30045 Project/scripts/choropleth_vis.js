@@ -13,7 +13,7 @@ function choropleth(){
 
 	var path = d3.geoPath().projection(projection);
 
-	var svg = d3.select("p").append("svg")
+	var svg = d3.select("#vis1-map").append("svg")
 				.attr("width", width)
 				.attr("height", height)
 				.attr("fill", "grey");
@@ -178,7 +178,7 @@ function choropleth(){
 					var pie = d3.pie();
 					var colour = d3.scaleOrdinal(d3.schemeCategory10);
 					var dataList = [d.properties.coal, d.properties.oil, d.properties.gas,d.properties.renewables];
-					var svg = d3.select("p")
+					var svg = d3.select("#vis1-pie")
 								.append("svg")
 								.attr("id", "pie_svg")
 								.attr("width", width)
@@ -242,10 +242,14 @@ function choropleth(){
 							  .text((d,i) => pie_legend_labels[i]);
 				
 					pie_legend.append("text")
-							.attr("x", width/2)
-							.attr("y", 20)
+							.attr("x", width/4)
+							.attr("y", 15)
 							.attr("fill", "black")
-							.text("ENERGY MIX, 2019-2020");
+							.style("font-size", "20px")
+							.style("font-weight", "bold")
+							.text("ENERGY MIX BY STATE AND TERRITORY, 2019-2020")
+							;
+					
 
 					//scroll to the bottom of the page where the pie chart is located
 					window.scrollTo(0, document.body.scrollHeight);
