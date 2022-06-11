@@ -29,11 +29,11 @@ function choropleth(){
 
 			d3.json("./data/australia_states.json").then(function(json){
 				//initialise color scheme for the choropleth map 
-				var color = d3.scaleThreshold().domain([0,200,400,600,800,1200,1400]).range(d3.schemeReds[6]);
+				var color = d3.scaleThreshold().domain([0,400,800,1200,1400, d3.max(data, function(d){return d.amount;})]).range(d3.schemeReds[6]);
 				
 				//create a color legend for the choropleth map
 				var legend = svg.selectAll("p")
-								.data([0,200,400,600,800,1200,1400])
+								.data([0,400,800,1200,1400])
             					.enter().append("g");
 				
 				var legend_labels = [">1400", "1200 - 1400", "800 - 1200", "400 - 800", "<400"];
